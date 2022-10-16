@@ -1,83 +1,52 @@
-from functools import reduce
-from math import sqrt
-from typing import TextIO
-
-from matplotlib import pyplot as plt
-
-
-def task1(movies_views: list[int], file: TextIO) -> None:
-    row_format = "{:>3} {:>10}"
-    file.write("Таблиця частот:\n")
-    file.write("Фільм   Перегляди\n")
-    for index, movie_views in enumerate(movies_views, 1):
-        file.write(f"{row_format.format(index, movie_views)}\n")
-    file.write("------------------\n")
-
-    checked_movies = []
-    file.write("Таблиця сукупних частот:\n")
-    file.write("Частота   Перегляди\n")
-    for movie_views in movies_views:
-        if movie_views in checked_movies:
-            continue
-        frequency = movies_views.count(movie_views)
-        checked_movies.append(movie_views)
-        file.write(f"{row_format.format(frequency, movie_views)}\n")
-    file.write("------------------\n")
-
-    max_views = max(movies_views)
-    for index, movie_views in enumerate(movies_views, 1):
-        if max_views == movie_views:
-            file.write(f"Фільм, переглянутий найчастіше: {index} -- {max_views}\n")
+from format_output import (
+    format_output_for_task1, format_output_for_task2, format_output_for_task3,
+    write_output_to_file, create_task4_graph
+)
+from services import (
+    get_frequencies, get_cumulative_frequencies, get_max_values, calculate_modes, calculate_median,
+    calculate_dispersion, calculate_standard_deviation
+)
+from utils import open_file, get_movie_views_from_input_data, get_sorted_dict
 
 
-def task2(movies_views: list[int], file: TextIO) -> None:
-    file.write(f"Мода: {max(movies_views)}\n")
-
-    movies_views = sorted(movies_views)
-    half_length = len(movies_views) / 2
-    file.write(f"Медіана: {(movies_views[int(half_length - 0.5)] + movies_views[int(half_length)]) / 2}\n")
-
-
-def task3(movies_views: list[int], file: TextIO) -> None:
-    movies_views_length = len(movies_views)
-    mean = reduce(lambda x, y: x + y, movies_views) / movies_views_length
-    result = 0
-    for movie_views in movies_views:
-        result += (movie_views - mean) ** 2
-    file.write(f"Дисперсія: {result / (movies_views_length - 1)}\n")
-
-    file.write(f"Середнє квадратичне відхилення розподілу: {sqrt(result / movies_views_length)}\n")
+def get_task1_result(movie_views: list[int]) -> str:
+    frequencies = get_sorted_dict(get_frequencies(movie_views))
+    cumulative_frequencies = get_sorted_dict(get_cumulative_frequencies(frequencies))
+    max_values = get_max_values(movie_views)
+    return format_output_for_task1(frequencies, cumulative_frequencies, max_values)
 
 
-def task4(movies_views: list[int]) -> None:
-    plt.figure(figsize=(15, 6), dpi=80)
-    plt.xlabel("Movies")
-    plt.ylabel("Views")
-    plt.bar([f"{_ * ' '}" for _ in range(len(movies_views))], movies_views)
-    plt.savefig("result.jpg")
+def get_task2_result(movies_views: list[int]) -> str:
+    modes = calculate_modes(movies_views)
+    median = calculate_median(movies_views)
+    return format_output_for_task2(modes, median)
+
+
+def get_task3_result(movies_views: list[int]) -> str:
+    dispersion = calculate_dispersion(movies_views)
+    standard_deviation = calculate_standard_deviation(movies_views)
+    return format_output_for_task3(dispersion, standard_deviation)
+
+
+def get_task4_result(movies_views: list[int]) -> None:
+    frequencies = get_sorted_dict(get_frequencies(movies_views))
+    create_task4_graph(frequencies)
 
 
 def main() -> None:
-    file_name = input("Enter file name: ")
-    try:
-        with open(file_name) as file:
-            movies_views = list(map(int, file.read().splitlines()[1:]))
-    except FileNotFoundError:
-        print("Напишіть дійсну назву файлу...")
-        return
+    file_name = input("Ведіть ім'я файлу: ")
+    input_data = open_file(file_name)
+    movie_views = get_movie_views_from_input_data(input_data)
 
-    with open("result.txt", "w", encoding="utf-8-sig") as file:
-        file.write("Завдання №1:\n")
-        task1(movies_views, file)
-
-        file.write("Завдання №2:\n")
-        task2(movies_views, file)
-
-        file.write("Завдання №3:\n")
-        task3(movies_views, file)
-
-        task4(movies_views)
+    output = get_task1_result(movie_views)
+    output += get_task2_result(movie_views)
+    output += get_task3_result(movie_views)
+    write_output_to_file(output)
+    get_task4_result(movie_views)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        print(str(e))
