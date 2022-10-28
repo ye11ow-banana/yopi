@@ -11,7 +11,7 @@ from utils import open_file, get_movie_views_from_input_data, get_sorted_dict
 
 def get_task1_result(movie_views: list[int]) -> str:
     frequencies = get_sorted_dict(get_frequencies(movie_views))
-    cumulative_frequencies = get_sorted_dict(get_cumulative_frequencies(frequencies))
+    cumulative_frequencies = get_cumulative_frequencies(frequencies)
     max_values = get_max_values(movie_views)
     return format_output_for_task1(frequencies, cumulative_frequencies, max_values)
 

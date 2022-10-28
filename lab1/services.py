@@ -36,19 +36,14 @@ def calculate_mean(list_: list[int]) -> float:
     return reduce(lambda x, y: x + y, list_) / movies_views_length
 
 
-def _calculate_numerator_dispersion(list_: list[int]) -> float:
-    mean = calculate_mean(list_)
-    result = 0
-    for movie_views in list_:
-        result += (movie_views - mean) ** 2
-    return result
-
-
 def calculate_dispersion(list_: list[int]) -> float:
-    numerator = _calculate_numerator_dispersion(list_)
-    return numerator / (len(list_) - 1)
+    mean = calculate_mean(list_)
+    numerator = 0
+    for movie_views in list_:
+        numerator += (movie_views - mean) ** 2
+    return numerator / (len(list_))
 
 
 def calculate_standard_deviation(list_: list[int]) -> float:
-    numerator = _calculate_numerator_dispersion(list_)
+    numerator = calculate_dispersion(list_)
     return sqrt(numerator / len(list_))
