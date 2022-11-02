@@ -12,6 +12,7 @@ def create_diagram(min_: int, max_: int, q1: float, q2: float, q3: float) -> Non
     fig, ax = plt.subplots()
     boxes = [{"label": "Diagram", "whislo": min_, "q1": q1, "med": q2, "q3": q3, "whishi": max_}]
     ax.bxp(boxes, showfliers=False)
+    plt.yticks(range(min_, max_, 5))
     plt.savefig(f"{RESULTS_DIR_PATH}result.jpg")
 
 
