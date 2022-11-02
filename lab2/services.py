@@ -45,11 +45,17 @@ def get_rearranged_list_for_teacher(list_: list[int], mean: float) -> list[float
     return [round(value * a + b, 2) for value in list_]
 
 
+def create_stems_with_empty_leafs(list_: list[str]) -> dict[str, list]:
+    min_ = int(list_[0][:-1]) if list_[0][:-1] else 0
+    max_ = int(list_[-1][:-1]) + 1
+    return {str(k): [] for k in range(min_, max_)}
+
+
 def create_stem_and_leaf_data(list_: list[int]) -> dict[str, list[str]]:
-    stem_and_leaf_data = {str(k): [] for k in range(10)}
-    for value in convert_list_items_to_type(str, list_):
-        stem, leaf = value[0], value[1:]
-        if len(value) == 1:
-            stem, leaf = "0", value
+    list_ = convert_list_items_to_type(str, list_)
+    stem_and_leaf_data = create_stems_with_empty_leafs(list_)
+    for _ in list_:
+        stem, leaf = _[:-1], _[-1]
+        stem = stem if stem else "0"
         stem_and_leaf_data[stem].append(leaf)
     return stem_and_leaf_data
